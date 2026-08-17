@@ -9,6 +9,10 @@ const msgAlert = document.getElementById('msgAlert');
 
 // On Page Load
 document.addEventListener('DOMContentLoaded', async () => {
+    AOS.init({ duration: 800, once: true });
+
+    document.getElementById('btnDangKyKhac')?.addEventListener('click', () => window.location.reload());
+
     showLoader();
     try {
         await Promise.all([loadConfig(), loadKhoaHoc(), loadDoiTuong()]);
@@ -182,6 +186,17 @@ document.getElementById('chkGiongHKTT').addEventListener('change', function() {
 frmDangKy.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!validateCurrentStep()) return;
+
+    // Honeypot validation
+    const honeypot = document.getElementById('WebsiteField');
+    if(honeypot && honeypot.value !== '') {
+        // Silent block for bot
+        document.getElementById('errorSummary').classList.add('d-none');
+        document.getElementById('successState').classList.remove('d-none');
+        frmDangKy.classList.add('d-none');
+        document.getElementById('stepper').classList.add('d-none');
+        return;
+    }
 
     const btnSubmit = document.getElementById('btnSubmitForm');
     btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>ĐANG GỬI...';

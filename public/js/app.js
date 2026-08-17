@@ -31,6 +31,22 @@ const views = document.querySelectorAll('.view-section');
 
 // ---- INITIALIZATION ----
 document.addEventListener('DOMContentLoaded', () => {
+    const attachEvt = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
+    attachEvt('btnShowDoiMatKhau', (e) => { e.preventDefault(); appDoiMatKhau.showModal(); });
+    attachEvt('btnViewTatCaChoDuyet', (e) => {
+        e.preventDefault();
+        document.querySelector('.sidebar-nav a[data-target="view-hocvien"]').click();
+        document.getElementById('filterDuyet_HV').value='Chờ duyệt';
+        setTimeout(loadHocVien, 300);
+    });
+    attachEvt('btnShortcutTaoKhoa', () => appKhoaHoc.showModal());
+    attachEvt('btnShortcutThemHV', () => appHocVien.showModal());
+    attachEvt('btnShortcutNhapDiem', () => document.querySelector('.sidebar-nav a[data-target="view-diem"]').click());
+    attachEvt('btnThemKhoaMoi', () => appKhoaHoc.showModal());
+    attachEvt('btnThemHVMoi', () => appHocVien.showModal());
+    attachEvt('btnSaveAllDiem', () => saveAllDiem());
+    attachEvt('btnTaoTaiKhoan', () => appUsers.showModal());
+
     checkLoginStatus();
 
     document.getElementById('frmLogin').addEventListener('submit', handleLogin);
@@ -201,7 +217,7 @@ async function loadThongBao() {
             if(!tb.DaDoc) unread++;
             const bgClass = tb.DaDoc ? '' : 'bg-light';
             ul.innerHTML += `
-                <li><a class="dropdown-item border-bottom ${bgClass}" href="#" onclick="markRead(${tb.MaTB})">
+                <li><a class="dropdown-item border-bottom ${bgClass} btn-mark-read" href="#" data-matb="${tb.MaTB}">
                     <small class="text-primary">${new Date(tb.ThoiGian).toLocaleString('vi-VN')}</small><br>
                     <span class="text-wrap" style="font-size:0.9rem">${escapeHTML(tb.NoiDung)}</span>
                 </a></li>
@@ -210,11 +226,21 @@ async function loadThongBao() {
     }
     badge.innerText = unread;
 }
-window.markRead = async function(maTb) {
-    const supabaseMod = await import('./supabase-client.js');
-    await supabaseMod.supabase.rpc('mark_read', { p_token: currentToken, p_matb: maTb });
-    loadThongBao();
-}
+
+document.getElementById('listThongBao').addEventListener('click', async (e) => {
+    const el = e.target.closest('.btn-mark-read');
+    if(el) {
+        e.preventDefault();
+        const maTb = el.getAttribute('data-matb');
+        try {
+            const supabaseMod = await import('./supabase-client.js');
+            await supabaseMod.supabase.rpc('mark_read', { p_token: currentToken, p_matb: parseInt(maTb) });
+            loadThongBao();
+        } catch(err) {
+            console.error(err);
+        }
+    }
+});
 
 // ---- MODULE: KHÓA HỌC ----
 async function loadDsKhoaHoc() {
@@ -431,11 +457,40 @@ window.editHocVien = async function(maHv) {
         document.getElementById('hv_SoCC').value = hv.SoCC || '';
         document.getElementById('hv_MaDoiTuong').value = hv.MaDoiTuong || '';
         document.getElementById('hv_ViecLam').value = hv.ViecLamSauDaoTao || '';
+        document.getElementById('hv_GhiChu').value = hv.GhiChu || '';
+
+        // Handle previous courses warning
+        const container = document.getElementById('hv_KhoaThamGiaContainer');
+        const inputLyDo = document.getElementById('hv_LyDoHocLai');
+        if(hv.KhoaDaThamGia && hv.KhoaDaThamGia.length > 0) {
+            document.getElementById('hv_KhoaThamGiaList').innerText = hv.KhoaDaThamGia.join(', ');
+            container.classList.remove('d-none');
+            inputLyDo.required = true;
+            // Parse existing reason from GhiChu if exists
+            const ghichu = hv.GhiChu || '';
+            const match = ghichu.match(/Lý do học lại: ([^\n]*)/);
+            if(match) {
+                inputLyDo.value = match[1];
+                document.getElementById('hv_GhiChu').value = ghichu.replace(match[0], '').replace(/^\n/, '').trim();
+            } else {
+                inputLyDo.value = '';
+            }
+        } else {
+            container.classList.add('d-none');
+            inputLyDo.required = false;
+        }
     }
 }
 
 async function saveHocVien(e) {
     e.preventDefault();
+
+    const inputLyDo = document.getElementById('hv_LyDoHocLai');
+    let ghichuText = document.getElementById('hv_GhiChu')?.value || '';
+    if (inputLyDo && inputLyDo.required && inputLyDo.value.trim() !== '') {
+        ghichuText = `Lý do học lại: ${inputLyDo.value.trim()}` + (ghichuText ? `\n${ghichuText}` : '');
+    }
+
     const dataObj = {
         MaHV: document.getElementById('hv_MaHV').value,
         MaKhoa: document.getElementById('hv_MaKhoa').value,
@@ -446,7 +501,8 @@ async function saveHocVien(e) {
         NgaySinh: document.getElementById('hv_NgaySinh').value || null,
         SoCC: document.getElementById('hv_SoCC').value,
         MaDoiTuong: document.getElementById('hv_MaDoiTuong').value ? parseInt(document.getElementById('hv_MaDoiTuong').value) : null,
-        ViecLamSauDaoTao: document.getElementById('hv_ViecLam').value
+        ViecLamSauDaoTao: document.getElementById('hv_ViecLam').value,
+        GhiChu: ghichuText
     };
     const supabaseMod = await import('./supabase-client.js');
     const { data } = await supabaseMod.supabase.rpc('admin_save_hocvien', { p_token: currentToken, p_mode: document.getElementById('hv_mode').value, p_data: dataObj });
