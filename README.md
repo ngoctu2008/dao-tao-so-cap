@@ -122,12 +122,12 @@ Supabase cho phép tạo Database Functions trực tiếp bằng SQL Editor và 
 Sau khi chạy migration, kiểm tra nhanh trong Supabase bằng các truy vấn sau:
 
 ```sql
-select * from public."Users";
-select * from public."Khoahoc";
+select * from public.users;
+select * from public.khoahoc;
 select public_get_khoatuyensinh();
 ```
 
-Tên bảng được tạo trong migration cần được giữ nguyên. Nếu project Supabase đã có dữ liệu hoặc object trùng tên, hãy tạo project/database riêng cho môi trường thử nghiệm trước khi chạy migration.
+Tên bảng được tạo trong migration cần được giữ nguyên (PostgreSQL tự động chuẩn hóa các định danh không dùng ngoặc kép thành chữ thường: `users`, `khoahoc`...). Nếu project Supabase đã có dữ liệu hoặc object trùng tên, hãy tạo project/database riêng cho môi trường thử nghiệm trước khi chạy migration.
 
 ## 5. Cấu hình và chạy local
 
