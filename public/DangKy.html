@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký Học Nghề - Trung tâm GDNN-GDTX Đăk Hà</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #004085; /* Màu xanh giáo dục */
+            --secondary-color: #0d6efd;
+            --bg-light: #f8f9fa;
+        }
+        body {
+            background-color: var(--bg-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .header-banner {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header-banner img {
+            max-width: 80px;
+            margin-bottom: 1rem;
+        }
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-bottom: 3rem;
+            border-top: 5px solid var(--primary-color);
+        }
+        .section-title {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        .form-label {
+            font-weight: 500;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.4);
+        }
+        footer {
+            background-color: #343a40;
+            color: #fff;
+            padding: 1.5rem 0;
+            text-align: center;
+        }
+        /* Loader */
+        #loader {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dangky.css">
+</head>
+<body>
+    <div id="loader">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Đang tải...</span>
+        </div>
+    </div>
+
+    <!-- Header Banner -->
+    <header class="wizard-header" data-aos="fade-down">
+        <div class="container">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Logo_BGD%C4%90T.svg/200px-Logo_BGD%C4%90T.svg.png" alt="Logo" id="site-logo" width="80" class="mb-3 bg-white p-2 rounded-circle shadow-sm">
+            <h2 id="site-title" class="fw-bold mb-2">Hệ thống Quản lý Đào tạo Nghề</h2>
+            <p class="text-white-50 mb-0">Trung tâm GDNN-GDTX khu vực Đăk Hà</p>
+        </div>
+    </header>
+
+    <div class="container pb-5" data-aos="fade-up" data-aos-delay="100">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="wizard-card">
+                    <h4 class="text-center fw-bold text-primary mb-4">ĐĂNG KÝ HỌC NGHỀ</h4>
+
+                    <!-- Stepper Indicator -->
+                    <div class="step-indicator" id="stepper">
+                        <div class="step-item active" data-step="1">
+                            <div class="step-number">1</div>
+                            <div class="step-label">Khóa học</div>
+                        </div>
+                        <div class="step-item" data-step="2">
+                            <div class="step-number">2</div>
+                            <div class="step-label">Cá nhân</div>
+                        </div>
+                        <div class="step-item" data-step="3">
+                            <div class="step-label"></div> <!-- Hide label on mobile if needed, handled by flex -->
+                            <div class="step-number">3</div>
+                            <div class="step-label">Giấy tờ</div>
+                        </div>
+                        <div class="step-item" data-step="4">
+                            <div class="step-number">4</div>
+                            <div class="step-label">Xác nhận</div>
+                        </div>
+                    </div>
+
+                    <div id="errorSummary" class="alert alert-danger d-none mb-4">
+                        <h6 class="alert-heading fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Vui lòng kiểm tra lại:</h6>
+                        <ul class="mb-0 ps-3" id="errorList"></ul>
+                    </div>
+
+                    <form id="frmDangKy" novalidate>
+
+                        <!-- BƯỚC 1 -->
+                        <div class="wizard-step-content active" id="step-1">
+                            <h5 class="fw-semibold mb-4 pb-2 border-bottom text-dark">Thông tin Khóa học</h5>
+                            <div class="mb-4">
+                                <label for="MaKhoa" class="form-label fw-medium">Chọn lớp học muốn đăng ký <span class="text-danger">*</span></label>
+                                <select class="form-select form-select-lg" id="MaKhoa" required>
+                                    <option value="">-- Đang tải danh sách lớp... --</option>
+                                </select>
+                            </div>
+                            <div class="text-end mt-5">
+                                <button type="button" class="btn btn-primary px-4 btn-next">Tiếp tục <i class="fas fa-arrow-right ms-2"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- BƯỚC 2 -->
+                        <div class="wizard-step-content" id="step-2">
+                            <h5 class="fw-semibold mb-4 pb-2 border-bottom text-dark">Thông tin Cá nhân</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="HoTen" class="form-label fw-medium">Họ và Tên <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="HoTen" required placeholder="Ví dụ: NGUYỄN VĂN A">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label d-block fw-medium">Giới tính <span class="text-danger">*</span></label>
+                                    <div class="d-flex gap-4 mt-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="GioiTinh" id="Nam" value="Nam" required checked>
+                                            <label class="form-check-label" for="Nam">Nam</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="GioiTinh" id="Nu" value="Nữ">
+                                            <label class="form-check-label" for="Nu">Nữ</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="NgaySinh" class="form-label fw-medium">Ngày sinh <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="NgaySinh" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="Dienthoai" class="form-label fw-medium">Số điện thoại <span class="text-danger">*</span></label>
+                                    <input type="tel" class="form-control" id="Dienthoai" required placeholder="09xxxxxxxxx" pattern="[0-9]{10,11}">
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-5">
+                                <button type="button" class="btn btn-outline-secondary px-4 btn-prev"><i class="fas fa-arrow-left me-2"></i> Quay lại</button>
+                                <button type="button" class="btn btn-primary px-4 btn-next">Tiếp tục <i class="fas fa-arrow-right ms-2"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- BƯỚC 3 -->
+                        <div class="wizard-step-content" id="step-3">
+                            <h5 class="fw-semibold mb-4 pb-2 border-bottom text-dark">Giấy tờ & Nơi cư trú</h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="SoCC" class="form-label fw-medium">Số CCCD/Căn cước <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="SoCC" required pattern="[0-9]{12}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="NgayCC" class="form-label fw-medium">Ngày cấp</label>
+                                    <input type="date" class="form-control" id="NgayCC">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="NoiCC" class="form-label fw-medium">Nơi cấp</label>
+                                    <input type="text" class="form-control" id="NoiCC" placeholder="Cục CS QLHC...">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="DanToc" class="form-label fw-medium">Dân tộc <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="DanToc" required value="Kinh">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="TonGiao" class="form-label fw-medium">Tôn giáo</label>
+                                    <input type="text" class="form-control" id="TonGiao" value="Không">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="TrinhDoVH" class="form-label fw-medium">Trình độ VH <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="TrinhDoVH" required>
+                                        <option value="">-- Chọn --</option>
+                                        <option value="Chưa qua đào tạo">Chưa qua đào tạo</option>
+                                        <option value="Tiểu học">Tiểu học</option>
+                                        <option value="THCS">THCS</option>
+                                        <option value="THPT">THPT</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12 mt-4">
+                                    <label for="HKTT" class="form-label fw-medium">Hộ khẩu thường trú <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="HKTT" required placeholder="Thôn/Xã, Huyện, Tỉnh">
+                                </div>
+                                <div class="col-12">
+                                    <label for="NoiCuTru" class="form-label fw-medium">Chỗ ở hiện tại <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control mb-2" id="NoiCuTru" required placeholder="Thôn/Xã, Huyện, Tỉnh">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="chkGiongHKTT">
+                                        <label class="form-check-label text-muted small" for="chkGiongHKTT">Giống Hộ khẩu thường trú</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-5">
+                                <button type="button" class="btn btn-outline-secondary px-4 btn-prev"><i class="fas fa-arrow-left me-2"></i> Quay lại</button>
+                                <button type="button" class="btn btn-primary px-4 btn-next">Tiếp tục <i class="fas fa-arrow-right ms-2"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- BƯỚC 4 -->
+                        <div class="wizard-step-content" id="step-4">
+                            <h5 class="fw-semibold mb-4 pb-2 border-bottom text-dark">Định hướng & Xác nhận</h5>
+
+                            <div class="mb-3">
+                                <label for="MaDoiTuong" class="form-label fw-medium">Thuộc đối tượng ưu tiên</label>
+                                <select class="form-select" id="MaDoiTuong">
+                                    <option value="">Không thuộc đối tượng ưu tiên</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="ViecLamDuKien" class="form-label fw-medium">Dự kiến việc làm sau khi học <span class="text-danger">*</span></label>
+                                <select class="form-select" id="ViecLamDuKien" required>
+                                    <option value="">-- Chọn định hướng --</option>
+                                    <option value="Tự tạo việc làm">Tự tạo việc làm (Mở tiệm, làm kinh tế hộ...)</option>
+                                    <option value="Được doanh nghiệp, đơn vị bao tiêu sản phẩm">Được doanh nghiệp bao tiêu sản phẩm</option>
+                                    <option value="Được ký hợp đồng lao động">Được doanh nghiệp ký hợp đồng lao động</option>
+                                    <option value="Đi làm việc có thời hạn ở nước ngoài">Đi làm việc có thời hạn ở nước ngoài (XKLĐ)</option>
+                                </select>
+                            </div>
+
+                            <div class="bg-light p-3 rounded border mb-4 mt-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="chkDongY" required>
+                                    <label class="form-check-label ms-1 text-muted" for="chkDongY" style="font-size: 0.85rem; text-align: justify; display: block;">
+                                        Tôi cam kết các thông tin khai báo trên là chính xác và <strong>đồng ý cho Trung tâm GDNN-GDTX khu vực Đăk Hà thu thập, xử lý dữ liệu cá nhân</strong> (bao gồm CCCD, ngày sinh, dân tộc, nơi cư trú...) nhằm mục đích phục vụ công tác tuyển sinh, quản lý đào tạo nghề theo quy định của pháp luật (Nghị định 13/2023/NĐ-CP).
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-5">
+                                <button type="button" class="btn btn-outline-secondary px-4 btn-prev"><i class="fas fa-arrow-left me-2"></i> Quay lại</button>
+                                <button type="submit" class="btn btn-success px-4" id="btnSubmitForm">
+                                    <i class="fas fa-paper-plane me-2"></i>GỬI HỒ SƠ
+                                </button>
+                            </div>
+                            <div id="msgAlert" class="alert mt-3 d-none"></div>
+                        </div>
+                    </form>
+
+                    <!-- SUCCESS STATE -->
+                    <div id="successState" class="text-center d-none py-4">
+                        <div class="mb-4">
+                            <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                        </div>
+                        <h4 class="fw-bold text-success mb-3">Đăng ký thành công!</h4>
+                        <p class="text-muted mb-4">Hồ sơ của bạn đã được ghi nhận. Vui lòng lưu lại mã hồ sơ dưới đây để trung tâm tiện đối chiếu:</p>
+                        <div class="bg-light border rounded p-3 d-inline-block mb-4">
+                            <h2 class="fw-bold text-primary mb-0" id="successMaHV">K2026-000-00</h2>
+                        </div>
+                        <p class="small text-muted">Trung tâm sẽ liên hệ lại với bạn qua số điện thoại đã cung cấp trong thời gian sớm nhất.</p>
+                        <button class="btn btn-outline-primary mt-3" onclick="window.location.reload()"><i class="fas fa-plus me-2"></i>Đăng ký người khác</button>
+                    </div>
+
+                </div>
+
+                <!-- Info Box -->
+                <div class="text-center mb-5">
+                    <p class="small text-muted mb-1"><i class="fas fa-shield-alt me-1"></i> Dữ liệu được mã hóa và bảo mật.</p>
+                    <p class="small text-muted">Mọi thắc mắc xin liên hệ phòng Giáo vụ: 0260 3xxx xxx</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer id="footer-text">
+        © 2024 Trung tâm GDNN-GDTX khu vực Đăk Hà
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script type="module" src="js/dangky.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+
+        // Auto fill NoiCuTru
+        document.getElementById('chkGiongHKTT').addEventListener('change', function() {
+            if(this.checked) {
+                document.getElementById('NoiCuTru').value = document.getElementById('HKTT').value;
+            } else {
+                document.getElementById('NoiCuTru').value = '';
+            }
+        });
+    </script>
+</body>
+</html>

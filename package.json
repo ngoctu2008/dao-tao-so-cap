@@ -1,0 +1,9 @@
+{
+  "name": "training-management-app",
+  "version": "1.0.0",
+  "description": "Hệ thống Quản lý Đào tạo Nghề (Vercel + Supabase)",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {}
+}

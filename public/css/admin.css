@@ -1,0 +1,145 @@
+/* APP SHELL & LAYOUT */
+#app-wrapper { display: none; height: 100vh; overflow: hidden; }
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    background-color: var(--color-primary-900);
+    color: white;
+    height: 100vh;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 1040;
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+}
+
+.sidebar .brand {
+    padding: 20px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar-nav { list-style: none; padding: 0; margin: 20px 0; }
+.sidebar-group-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    padding: 10px 20px 5px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+.sidebar-nav li a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: rgba(255,255,255,0.8);
+    transition: all 0.2s;
+    border-radius: 0 25px 25px 0;
+    margin-right: 15px;
+    margin-bottom: 4px;
+}
+.sidebar-nav li a:hover, .sidebar-nav li a.active {
+    background-color: var(--color-primary-600);
+    color: white;
+}
+.sidebar-nav li a i { width: 24px; text-align: center; margin-right: 10px; }
+
+/* Main Content */
+.main-content {
+    margin-left: 260px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-background);
+}
+
+/* Topbar */
+.topbar {
+    height: 64px;
+    background: var(--color-surface);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    z-index: 1030;
+}
+
+.page-title { margin: 0; font-size: 1.25rem; font-weight: 600; color: var(--color-text); }
+
+/* Content Area */
+.content-area {
+    padding: 24px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Views */
+.view-section { display: none; }
+.view-section.active { display: block; }
+
+/* Cards & Tables */
+.card { border: none; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px; }
+.card-header { background: var(--color-surface); border-bottom: 1px solid #E2E8F0; padding: 16px 20px; }
+.table th { font-weight: 600; color: var(--color-muted); text-transform: uppercase; font-size: 0.85rem; border-top: none; }
+
+/* Login Split View */
+.login-container { display: flex; height: 100vh; }
+.login-left {
+    flex: 1;
+    background: var(--color-primary-900) url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Logo_BGD%C4%90T.svg/200px-Logo_BGD%C4%90T.svg.png') no-repeat center center;
+    background-size: 300px;
+    background-blend-mode: multiply;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    padding: 40px;
+    text-align: center;
+}
+.login-left::before {
+    content: '';
+    position: absolute;
+    top:0; left:0; right:50%; bottom:0;
+    background: rgba(18, 59, 99, 0.85); /* primary-900 with opacity */
+    z-index: 0;
+}
+.login-left > div { z-index: 1; }
+
+.login-right {
+    width: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface);
+    padding: 40px;
+}
+.login-form-wrapper { width: 100%; max-width: 360px; }
+
+/* Drawer (Offcanvas override) */
+.offcanvas-end { width: 600px !important; }
+.action-bar-bottom { position: absolute; bottom: 0; left: 0; right: 0; padding: 16px; background: white; border-top: 1px solid #ddd; display:flex; justify-content: flex-end; gap: 10px; }
+.drawer-body-scroll { height: calc(100% - 130px); overflow-y: auto; padding: 20px; }
+
+/* Mobile Sidebar Toggle */
+@media (max-width: 991px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.show { transform: translateX(0); box-shadow: 4px 0 10px rgba(0,0,0,0.1); }
+    .main-content { margin-left: 0; }
+    .mobile-toggle { display: block !important; }
+    .login-container { flex-direction: column; }
+    .login-left { flex: 0.4; background-size: 150px; }
+    .login-left::before { right: 0; bottom: 60%; }
+    .login-right { width: 100%; flex: 0.6; }
+    .offcanvas-end { width: 100% !important; }
+}
+.mobile-toggle { display: none; background: none; border: none; font-size: 1.5rem; color: var(--color-text); margin-right: 15px; }
+
+/* Sticky Table */
+.table-sticky-header th { position: sticky; top: 0; background: var(--color-surface); z-index: 1; box-shadow: 0 1px 0 #ddd; }
