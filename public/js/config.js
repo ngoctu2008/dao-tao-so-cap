@@ -1,4 +1,4 @@
-const SUPABASE_URL = 'https://example.supabase.co';
-const SUPABASE_ANON_KEY = 'dummy_key';
+const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
 
 export { SUPABASE_URL, SUPABASE_ANON_KEY };
