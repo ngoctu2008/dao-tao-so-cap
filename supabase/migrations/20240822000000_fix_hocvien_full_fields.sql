@@ -139,7 +139,7 @@ BEGIN
         RETURN json_build_object('success', false, 'message', 'Số CCCD này đã tồn tại trong khóa học.');
     END;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
 
 
 CREATE OR REPLACE FUNCTION get_hocvien(
@@ -197,7 +197,7 @@ BEGIN
 
     RETURN json_build_object('success', true, 'data', COALESCE(v_res, '[]'::jsonb));
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
 
 -- admin_update_cauhinh
 CREATE OR REPLACE FUNCTION admin_update_cauhinh(p_token TEXT, p_data jsonb)
@@ -223,6 +223,6 @@ BEGIN
 
     RETURN json_build_object('success', true, 'message', 'Cập nhật cấu hình thành công');
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
 
 GRANT EXECUTE ON FUNCTION admin_update_cauhinh(TEXT, jsonb) TO anon, authenticated;
