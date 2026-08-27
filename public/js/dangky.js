@@ -178,6 +178,13 @@ document.getElementById('chkGiongHKTT').addEventListener('change', function() {
     }
 });
 
+// Sync when HKTT changes if checkbox is checked
+document.getElementById('HKTT').addEventListener('input', function() {
+    if(document.getElementById('chkGiongHKTT').checked) {
+        document.getElementById('NoiCuTru').value = this.value;
+    }
+});
+
 // Update Submit Logic
 frmDangKy.addEventListener('submit', async (e) => {
     e.preventDefault();
