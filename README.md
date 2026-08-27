@@ -181,6 +181,8 @@ git diff -- public/js/config.js
 
 ## 6. Triển khai lên Vercel
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fngoctu2008%2Fdao-tao-so-cap&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY)
+
 ### Bước 1: Kết nối repository
 
 Đăng nhập [Vercel](https://vercel.com), chọn **Add New → Project**, import repository GitHub và chọn branch cần triển khai.

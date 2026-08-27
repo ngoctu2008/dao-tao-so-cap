@@ -31,6 +31,23 @@ const views = document.querySelectorAll('.view-section');
 
 // ---- INITIALIZATION ----
 document.addEventListener('DOMContentLoaded', () => {
+    const attachEvt = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
+    attachEvt('btnShowDoiMatKhau', (e) => { e.preventDefault(); appDoiMatKhau.showModal(); });
+    attachEvt('btnViewTatCaChoDuyet', (e) => {
+        e.preventDefault();
+        document.querySelector('.sidebar-nav a[data-target="view-hocvien"]').click();
+        document.getElementById('filterDuyet_HV').value='Chờ duyệt';
+        setTimeout(loadHocVien, 300);
+    });
+    attachEvt('btnShortcutTaoKhoa', () => appKhoaHoc.showModal());
+    attachEvt('btnShortcutThemHV', () => appHocVien.showModal());
+    attachEvt('btnShortcutNhapDiem', () => document.querySelector('.sidebar-nav a[data-target="view-diem"]').click());
+    attachEvt('btnThemKhoaMoi', () => appKhoaHoc.showModal());
+    attachEvt('btnThemHVMoi', () => appHocVien.showModal());
+    attachEvt('btnSaveAllDiem', () => saveAllDiem());
+    attachEvt('btnTaoTaiKhoan', () => appUsers.showModal());
+    attachEvt('btnCauHinh', () => appCauHinh.showModal());
+
     checkLoginStatus();
 
     document.getElementById('frmLogin').addEventListener('submit', handleLogin);
@@ -108,7 +125,8 @@ async function handleLogin(e) {
             alertBox.classList.remove('d-none');
         }
     } catch (err) {
-        alertMsg.innerText = "Lỗi kết nối hoặc cấu hình mạng!";
+        console.error(err);
+        alertMsg.innerText = "Lỗi kết nối hoặc cấu hình mạng! Vui lòng kiểm tra console log.";
         alertBox.classList.remove('d-none');
     } finally {
         btnSubmit.innerHTML = 'ĐĂNG NHẬP';
@@ -454,10 +472,40 @@ async function saveHocVien(e) {
 }
 
 window.duyetHocVien = async function(maHv) {
-    if(confirm('Chấp nhận học viên này vào lớp chính thức?')) {
-        const supabaseMod = await import('./supabase-client.js');
-        await supabaseMod.supabase.rpc('admin_save_hocvien', { p_token: currentToken, p_mode: 'edit', p_data: { MaHV: maHv, TrangThaiDuyet: 'Đã duyệt' } });
-        loadHocVien(); loadDashboard();
+    const supabaseMod = await import('./supabase-client.js');
+
+    // Fetch user detail first to check KhoaDaThamGia
+    const { data: fetchResult } = await supabaseMod.supabase.rpc('get_hocvien', { p_token: currentToken });
+    let isReturning = false;
+    if(fetchResult && fetchResult.success && fetchResult.data) {
+        const hv = fetchResult.data.find(h => h.MaHV === maHv);
+        if(hv && hv.KhoaDaThamGia && hv.KhoaDaThamGia.length > 0) {
+            isReturning = true;
+        }
+    }
+
+    if (isReturning) {
+        const reason = prompt('Học viên này đã từng tham gia học trước đây.\nVui lòng nhập nguyên nhân xin học lại (Bắt buộc):');
+        if (reason === null) return; // User cancelled
+        if (reason.trim() === '') {
+            alert('Bạn phải nhập nguyên nhân học lại để duyệt học viên này.');
+            return;
+        }
+
+        if(confirm('Chấp nhận học viên này vào lớp chính thức?')) {
+            const { error } = await supabaseMod.supabase.rpc('admin_save_hocvien', {
+                p_token: currentToken,
+                p_mode: 'edit',
+                p_data: { MaHV: maHv, TrangThaiDuyet: 'Đã duyệt', GhiChu: `[Học lại - Lý do: ${reason}]` }
+            });
+            if (error) { alert('Lỗi: ' + error.message); }
+            loadHocVien(); loadDashboard();
+        }
+    } else {
+        if(confirm('Chấp nhận học viên này vào lớp chính thức?')) {
+            await supabaseMod.supabase.rpc('admin_save_hocvien', { p_token: currentToken, p_mode: 'edit', p_data: { MaHV: maHv, TrangThaiDuyet: 'Đã duyệt' } });
+            loadHocVien(); loadDashboard();
+        }
     }
 }
 
@@ -722,6 +770,7 @@ document.addEventListener('click', function(e) {
     if(action === 'edit-kh') window.editKhoaHoc(id);
     if(action === 'del-kh') window.deleteKhoaHoc(id);
 
+    if(action === 'view-hv-detail') window.xemHocVienDetail(id);
     if(action === 'duyet-hv') window.duyetHocVien(id);
     if(action === 'edit-hv') window.editHocVien(id);
     if(action === 'del-hv') window.xoaHocVien(id);
@@ -822,3 +871,97 @@ window.saveAllDiem = async function() {
     btnSave.innerHTML = '<i class="fas fa-save me-2"></i>Lưu Bảng Điểm';
     btnSave.disabled = false;
 }
+
+const appCauHinh = {
+    modal: null,
+    init: function() {
+        this.modal = new bootstrap.Modal(document.getElementById('mdlCauHinh'));
+        document.getElementById('frmCauHinh').addEventListener('submit', this.save.bind(this));
+    },
+    showModal: async function() {
+        if(!this.modal) this.init();
+        document.getElementById('cauhinhAlert').classList.add('d-none');
+
+        const supabaseMod = await import('./supabase-client.js');
+        const { data } = await supabaseMod.supabase.from('CauHinh').select('*').limit(1);
+        if (data && data.length > 0) {
+            const ch = data[0];
+            document.getElementById('c_TenSite').value = ch.TenSite || '';
+            document.getElementById('c_LogoUrl').value = ch.LogoUrl || '';
+            document.getElementById('c_MauChuDao').value = ch.MauChuDao || '#004085';
+            document.getElementById('c_ChanTrang').value = ch.ChanTrang || '';
+        }
+
+        this.modal.show();
+    },
+    save: async function(e) {
+        e.preventDefault();
+        const dataObj = {
+            TenSite: document.getElementById('c_TenSite').value,
+            LogoUrl: document.getElementById('c_LogoUrl').value,
+            MauChuDao: document.getElementById('c_MauChuDao').value,
+            ChanTrang: document.getElementById('c_ChanTrang').value
+        };
+        const supabaseMod = await import('./supabase-client.js');
+        const { data, error } = await supabaseMod.supabase.rpc('admin_update_cauhinh', { p_token: currentToken, p_data: dataObj });
+
+        const alertBox = document.getElementById('cauhinhAlert');
+        if(error || (data && !data.success)) {
+            alertBox.innerText = error ? error.message : data.message;
+            alertBox.classList.remove('d-none');
+        } else {
+            this.modal.hide();
+            alert('Lưu cấu hình thành công! Hãy tải lại trang để áp dụng.');
+            window.location.reload();
+        }
+    }
+};
+
+window.xemHocVienDetail = async function(maHv) {
+    const supabaseMod = await import('./supabase-client.js');
+    const { data } = await supabaseMod.supabase.rpc('get_hocvien', { p_token: currentToken });
+    const hv = data.data.find(h => h.MaHV === maHv);
+    if(!hv) return;
+
+    const modal = new bootstrap.Modal(document.getElementById('mdlHocVienDetail'));
+    const content = document.getElementById('detailHocVienContent');
+
+    content.innerHTML = `
+        <div class="col-md-6"><strong>Mã HV:</strong> ${hv.MaHV}</div>
+        <div class="col-md-6"><strong>Họ tên:</strong> ${escapeHTML(hv.HoTen)}</div>
+        <div class="col-md-6"><strong>Giới tính:</strong> ${escapeHTML(hv.GioiTinh || '')}</div>
+        <div class="col-md-6"><strong>Ngày sinh:</strong> ${hv.NgaySinh || ''}</div>
+        <div class="col-md-6"><strong>CCCD:</strong> ${escapeHTML(hv.SoCC || '')}</div>
+        <div class="col-md-6"><strong>Ngày/Nơi cấp:</strong> ${hv.NgayCC || ''} - ${escapeHTML(hv.NoiCC || '')}</div>
+        <div class="col-md-6"><strong>SĐT:</strong> ${escapeHTML(hv.Dienthoai || '')}</div>
+        <div class="col-md-6"><strong>Trạng thái:</strong> <span class="badge ${hv.TrangThaiDuyet==='Đã duyệt'?'bg-success':'bg-warning text-dark'}">${escapeHTML(hv.TrangThaiDuyet)}</span></div>
+        <div class="col-md-6"><strong>Dân tộc / Tôn giáo:</strong> ${escapeHTML(hv.DanToc || '')} / ${escapeHTML(hv.TonGiao || '')}</div>
+        <div class="col-md-6"><strong>Trình độ VH:</strong> ${escapeHTML(hv.TrinhDoVH || '')}</div>
+        <div class="col-12"><strong>HKTT:</strong> ${escapeHTML(hv.HKTT || '')}</div>
+        <div class="col-12"><strong>Nơi cư trú:</strong> ${escapeHTML(hv.NoiCuTru || '')}</div>
+        <div class="col-12"><strong>Việc làm mong muốn:</strong> ${escapeHTML(hv.ViecLamSauDaoTao || '')}</div>
+        <div class="col-12"><strong>Khóa đã tham gia:</strong> ${hv.KhoaDaThamGia ? hv.KhoaDaThamGia.join(', ') : 'Chưa có'}</div>
+        <div class="col-12"><strong>Ghi chú:</strong> <div style="white-space: pre-wrap;">${escapeHTML(hv.GhiChu || '')}</div></div>
+    `;
+
+    const btnApprove = document.getElementById('btnDetailApprove');
+    const btnEdit = document.getElementById('btnDetailEdit');
+
+    // Only Admin/Giáo vụ can approve
+    if (['Ban Giám đốc', 'Giáo vụ'].includes(currentUserRole)) {
+        btnEdit.classList.remove('d-none');
+        btnEdit.onclick = () => { modal.hide(); window.editHocVien(maHv); };
+
+        if (hv.TrangThaiDuyet === 'Chờ duyệt') {
+            btnApprove.classList.remove('d-none');
+            btnApprove.onclick = () => { modal.hide(); window.duyetHocVien(maHv); };
+        } else {
+            btnApprove.classList.add('d-none');
+        }
+    } else {
+        btnApprove.classList.add('d-none');
+        btnEdit.classList.add('d-none');
+    }
+
+    modal.show();
+};
