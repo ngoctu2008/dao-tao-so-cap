@@ -107,19 +107,28 @@ Không đưa `service_role` key vào frontend, Git repository hoặc biến môi
 
 ### Bước 2: Chạy migration
 
-Mở **SQL Editor → New query**, copy toàn bộ nội dung tệp sau rồi nhấn **Run**:
+Mở **SQL Editor → New query**, copy toàn bộ nội dung lần lượt các tệp sau rồi nhấn **Run** theo thứ tự từ trên xuống dưới:
 
 ```text
 supabase/migrations/20240101000000_init_schema.sql
+supabase/migrations/20240817000000_update_schema.sql
+supabase/migrations/20240822000000_fix_hocvien_full_fields.sql
 ```
 
 Migration tạo các bảng nghiệp vụ như `Users`, `UserSessions`, `DoiTuong`, `Nghedaotao`, `Khoahoc`, `Hocvien`, `Diem`, `ThongBao` và `CauHinh`. Migration đồng thời tạo các Database Functions/RPC cho đăng nhập, xác thực session, dashboard, khóa học, học viên, điểm, đăng ký công khai, quản lý người dùng và thông báo.
 
 Supabase cho phép tạo Database Functions trực tiếp bằng SQL Editor và gọi chúng từ JavaScript bằng `supabase.rpc()` [1]. Vì migration của dự án có nhiều function phụ thuộc vào thứ tự tạo bảng, nên nên chạy toàn bộ file trong một lần thay vì tách thủ công thành nhiều đoạn.
 
-### Bước 3: Kiểm tra database
+### Bước 3: Nạp lại Schema Cache
 
-Sau khi chạy migration, kiểm tra nhanh trong Supabase bằng các truy vấn sau:
+Nếu bạn gặp lỗi kết nối (PGRST202 hoặc hàm không tồn tại), hãy vào **Project Settings → API** và nhấn **Reload schema cache**, hoặc chạy lệnh sau trong SQL Editor để PostgREST nạp lại danh sách hàm:
+```sql
+NOTIFY pgrst, 'reload schema';
+```
+
+### Bước 4: Kiểm tra database
+
+Sau khi chạy migration và reload schema, kiểm tra nhanh trong Supabase bằng các truy vấn sau:
 
 ```sql
 select * from public."Users";
