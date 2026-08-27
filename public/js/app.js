@@ -125,7 +125,8 @@ async function handleLogin(e) {
             alertBox.classList.remove('d-none');
         }
     } catch (err) {
-        alertMsg.innerText = "Lỗi kết nối hoặc cấu hình mạng!";
+        console.error(err);
+        alertMsg.innerText = "Lỗi kết nối hoặc cấu hình mạng! Vui lòng kiểm tra console log.";
         alertBox.classList.remove('d-none');
     } finally {
         btnSubmit.innerHTML = 'ĐĂNG NHẬP';
