@@ -189,15 +189,16 @@ git diff -- public/js/config.js
 
 ## 6. Triển khai lên Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fngoctu2008%2Fdao-tao-so-cap&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fngoctu2008%2Fdao-tao-so-cap&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY,POSTGRES_URL)
 
 1. Tạo tài khoản miễn phí tại [Vercel.com](https://vercel.com) (nếu chưa có).
 2. Tự động sao chép (Fork) repository này về tài khoản GitHub của bạn.
 3. Liên kết repository vừa fork với Vercel và triển khai. (Quá trình build sẽ báo lỗi nếu bạn chưa khai báo biến môi trường, hãy thực hiện bước 4).
-4. Tại màn hình cài đặt của Vercel (**Project Settings > Environment Variables**), hãy điền 2 biến môi trường (lấy từ Supabase):
+4. Tại màn hình cài đặt của Vercel (**Project Settings > Environment Variables**), hãy điền 3 biến môi trường (lấy từ Supabase):
    - `NEXT_PUBLIC_SUPABASE_URL` = (Điền Project URL của Supabase)
    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` = (Điền Project API Keys anon của Supabase)
-5. Nhấn **Redeploy** và chờ 2 -> 3 phút để hệ thống tự động thiết lập.
+   - `POSTGRES_URL` = (Điền chuỗi kết nối Connection String (URI) của Supabase. VD: `postgresql://postgres.[project-ref]:[password]...`)
+5. Nhấn **Redeploy** và chờ 2 -> 3 phút để hệ thống tự động thiết lập Database, tạo tài khoản Admin và build giao diện.
 
 Cấu hình của dự án đã được tích hợp sẵn trong `vercel.json` (build command, output directory `public`, headers).
 
