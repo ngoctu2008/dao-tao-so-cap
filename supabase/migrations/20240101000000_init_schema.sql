@@ -720,3 +720,21 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 GRANT EXECUTE ON FUNCTION admin_get_users(TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION admin_toggle_user(TEXT, VARCHAR) TO anon, authenticated;
+
+-- Restore execution grants that were missed
+GRANT EXECUTE ON FUNCTION login_user_v2(VARCHAR, VARCHAR) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public_get_khoatuyensinh() TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public_get_doituong() TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION register_hocvien(jsonb) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_khoahoc(TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_hocvien(TEXT, TEXT, TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_dashboard_stats(TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_thongbao(TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_cache_data(TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION admin_save_khoahoc(TEXT, TEXT, jsonb) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION admin_delete_khoahoc(TEXT, TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION admin_save_hocvien(TEXT, TEXT, jsonb) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION admin_delete_hocvien(TEXT, TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION mark_read(TEXT, INT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION change_password(TEXT, TEXT, TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION admin_create_user(TEXT, VARCHAR, VARCHAR, VARCHAR, VARCHAR) TO anon, authenticated;
