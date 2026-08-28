@@ -114,7 +114,7 @@ async function handleLogin(e) {
         const supabaseMod = await import('./supabase-client.js');
         const supabaseClient = supabaseMod.supabase;
 
-        const { data, error } = await supabaseClient.rpc('login_user_v2', { p_username: u, p_password: p });
+        const { data, error } = await supabaseMod.rpcWithRetry('login_user_v2', { p_username: u, p_password: p });
         if (error) throw error;
         if (data.success) {
             sessionStorage.setItem('user', JSON.stringify(data.user));
@@ -160,7 +160,7 @@ async function initAppData() {
 
 async function loadCacheData() {
     const supabaseMod = await import('./supabase-client.js');
-    const { data } = await supabaseMod.supabase.rpc('get_cache_data', { p_token: currentToken });
+    const { data } = await supabaseMod.rpcWithRetry('get_cache_data', { p_token: currentToken });
     if(data && data.success) {
         cachedNghe = data.data.Nghedaotao || [];
         cachedDoiTuong = data.data.DoiTuong || [];
@@ -180,7 +180,7 @@ function loadViewData(viewId) {
 // ---- DASHBOARD ----
 async function loadDashboard() {
     const supabaseMod = await import('./supabase-client.js');
-    const { data } = await supabaseMod.supabase.rpc('get_dashboard_stats', { p_token: currentToken });
+    const { data } = await supabaseMod.rpcWithRetry('get_dashboard_stats', { p_token: currentToken });
     if(data && data.success) {
         document.getElementById('stat-lop').innerText = data.data.cLop || 0;
         document.getElementById('stat-hvdanghoc').innerText = data.data.cHv || 0;
@@ -189,7 +189,7 @@ async function loadDashboard() {
     }
 
     // Tải danh sách hồ sơ mới cần duyệt
-    const res = await supabaseMod.supabase.rpc('get_hocvien', { p_token: currentToken, p_makhoa: null, p_ttduyet: 'Chờ duyệt' });
+    const res = await supabaseMod.rpcWithRetry('get_hocvien', { p_token: currentToken, p_makhoa: null, p_ttduyet: 'Chờ duyệt' });
     const tbody = document.getElementById('tblDashboardChoduyet');
     if(res.data && res.data.success && res.data.data.length > 0) {
         tbody.innerHTML = '';
@@ -212,7 +212,7 @@ async function loadDashboard() {
 // ---- THÔNG BÁO ----
 async function loadThongBao() {
     const supabaseMod = await import('./supabase-client.js');
-    const { data } = await supabaseMod.supabase.rpc('get_thongbao', { p_token: currentToken });
+    const { data } = await supabaseMod.rpcWithRetry('get_thongbao', { p_token: currentToken });
     if(!data || !data.success) return;
 
     const ul = document.getElementById('listThongBao');
@@ -236,7 +236,7 @@ async function loadThongBao() {
 }
 window.markRead = async function(maTb) {
     const supabaseMod = await import('./supabase-client.js');
-    await supabaseMod.supabase.rpc('mark_read', { p_token: currentToken, p_matb: maTb });
+    await supabaseMod.rpcWithRetry('mark_read', { p_token: currentToken, p_matb: maTb });
     loadThongBao();
 }
 
@@ -244,7 +244,7 @@ window.markRead = async function(maTb) {
 async function loadDsKhoaHoc() {
     const supabaseMod = await import('./supabase-client.js');
     const tbody = document.getElementById('tblKhoaHoc');
-    const { data } = await supabaseMod.supabase.rpc('get_khoahoc', { p_token: currentToken });
+    const { data } = await supabaseMod.rpcWithRetry('get_khoahoc', { p_token: currentToken });
 
     if(!data || !data.success) { tbody.innerHTML = '<tr><td colspan="7">Lỗi tải dữ liệu</td></tr>'; return; }
 
@@ -308,7 +308,7 @@ window.appKhoaHoc = {
 
 window.editKhoaHoc = async function(maKhoa) {
     const supabaseMod = await import('./supabase-client.js');
-    const { data } = await supabaseMod.supabase.rpc('get_khoahoc', { p_token: currentToken });
+    const { data } = await supabaseMod.rpcWithRetry('get_khoahoc', { p_token: currentToken });
     const kh = data.data.find(k => k.MaKhoa === maKhoa);
     if(kh) {
         appKhoaHoc.showModal();
@@ -328,7 +328,7 @@ window.editKhoaHoc = async function(maKhoa) {
 window.deleteKhoaHoc = async function(maKhoa) {
     if(confirm('Chắc chắn xóa khóa học này và tất cả học viên thuộc khóa?')) {
         const supabaseMod = await import('./supabase-client.js');
-        const { data } = await supabaseMod.supabase.rpc('admin_delete_khoahoc', { p_token: currentToken, p_makhoa: maKhoa });
+        const { data } = await supabaseMod.rpcWithRetry('admin_delete_khoahoc', { p_token: currentToken, p_makhoa: maKhoa });
         if(!data.success) alert("Lỗi xóa: " + data.message); else { loadDsKhoaHoc(); loadDashboard(); }
     }
 }
@@ -346,7 +346,7 @@ async function saveKhoaHoc(e) {
         DenNgay: document.getElementById('kh_DenNgay').value || null
     };
     const supabaseMod = await import('./supabase-client.js');
-    const { data } = await supabaseMod.supabase.rpc('admin_save_khoahoc', { p_token: currentToken, p_mode: document.getElementById('kh_mode').value, p_data: dataObj });
+    const { data } = await supabaseMod.rpcWithRetry('admin_save_khoahoc', { p_token: currentToken, p_mode: document.getElementById('kh_mode').value, p_data: dataObj });
     if(!data.success) alert("Lỗi: " + data.message);
     else { bootstrap.Modal.getInstance(document.getElementById('modalKhoaHoc')).hide(); loadDsKhoaHoc(); loadDashboard(); }
 }
@@ -354,7 +354,7 @@ async function saveKhoaHoc(e) {
 // ---- MODULE: HỌC VIÊN ----
 async function initHocVienView() {
     const supabaseMod = await import('./supabase-client.js');
-    const { data } = await supabaseMod.supabase.rpc('get_khoahoc', { p_token: currentToken });
+    const { data } = await supabaseMod.rpcWithRetry('get_khoahoc', { p_token: currentToken });
     const filter = document.getElementById('filterKhoaHoc_HV');
     filter.innerHTML = '<option value="">-- Tất cả các khóa --</option>';
     if(data && data.success) {
@@ -370,7 +370,7 @@ async function loadHocVien() {
     const tbody = document.getElementById('tblHocVien');
 
     const supabaseMod = await import('./supabase-client.js');
-    const { data } = await supabaseMod.supabase.rpc('get_hocvien', { p_token: currentToken, p_makhoa: maKhoa, p_ttduyet: ttDuyet });
+    const { data } = await supabaseMod.rpcWithRetry('get_hocvien', { p_token: currentToken, p_makhoa: maKhoa, p_ttduyet: ttDuyet });
     if(!data || !data.success) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Lỗi tải dữ liệu</td></tr>'; return; }
 
     let hocviens = data.data;
@@ -431,7 +431,7 @@ window.appHocVien = {
         document.getElementById('frmSaveHocVien').reset();
         document.getElementById('hv_mode').value = 'add'; document.getElementById('hv_MaKhoa').disabled = false;
         const supabaseMod = await import('./supabase-client.js');
-        const { data } = await supabaseMod.supabase.rpc('get_khoahoc', { p_token: currentToken });
+        const { data } = await supabaseMod.rpcWithRetry('get_khoahoc', { p_token: currentToken });
         document.getElementById('hv_MaKhoa').innerHTML = data.data.map(k => `<option value="${escapeHTML(k.MaKhoa)}">${escapeHTML(k.MaKhoa)}</option>`).join('');
         document.getElementById('hv_MaDoiTuong').innerHTML = '<option value="">Không</option>' + cachedDoiTuong.map(d => `<option value="${d.MaDoiTuong}">${escapeHTML(d.TenDoiTuong)}</option>`).join('');
         new bootstrap.Modal(document.getElementById('modalHocVien')).show();
@@ -440,7 +440,7 @@ window.appHocVien = {
 
 window.editHocVien = async function(maHv) {
     const supabaseMod = await import('./supabase-client.js');
-    const { data } = await supabaseMod.supabase.rpc('get_hocvien', { p_token: currentToken });
+    const { data } = await supabaseMod.rpcWithRetry('get_hocvien', { p_token: currentToken });
     const hv = data.data.find(h => h.MaHV === maHv);
     if(hv) {
         await appHocVien.showModal();
@@ -520,14 +520,14 @@ async function saveHocVien(e) {
 
     if (newReason) {
         const supabaseMod = await import('./supabase-client.js');
-        const { data: fetchResult } = await supabaseMod.supabase.rpc('get_hocvien', { p_token: currentToken });
+        const { data: fetchResult } = await supabaseMod.rpcWithRetry('get_hocvien', { p_token: currentToken });
         const hv = fetchResult?.data?.find(h => h.MaHV === dataObj.MaHV);
         let existingNotes = hv?.GhiChu || '';
         if (existingNotes && !existingNotes.endsWith('\n')) existingNotes += '\n';
         dataObj.GhiChu = existingNotes + `[Học lại - Lý do: ${newReason}]`;
     }
     const supabaseMod = await import('./supabase-client.js');
-    const { data } = await supabaseMod.supabase.rpc('admin_save_hocvien', { p_token: currentToken, p_mode: document.getElementById('hv_mode').value, p_data: dataObj });
+    const { data } = await supabaseMod.rpcWithRetry('admin_save_hocvien', { p_token: currentToken, p_mode: document.getElementById('hv_mode').value, p_data: dataObj });
     if(!data.success) alert("Lỗi: " + data.message); else { bootstrap.Modal.getInstance(document.getElementById('modalHocVien')).hide(); loadHocVien(); loadDashboard(); }
 }
 
@@ -535,7 +535,7 @@ window.duyetHocVien = async function(maHv) {
     const supabaseMod = await import('./supabase-client.js');
 
     // Fetch user detail first to check KhoaDaThamGia
-    const { data: fetchResult } = await supabaseMod.supabase.rpc('get_hocvien', { p_token: currentToken });
+    const { data: fetchResult } = await supabaseMod.rpcWithRetry('get_hocvien', { p_token: currentToken });
     let isReturning = false;
     let hv = null;
     if(fetchResult && fetchResult.success && fetchResult.data) {
@@ -557,7 +557,7 @@ window.duyetHocVien = async function(maHv) {
             let existingNotes = hv.GhiChu || '';
             if (existingNotes && !existingNotes.endsWith('\n')) existingNotes += '\n';
 
-            const { error } = await supabaseMod.supabase.rpc('admin_save_hocvien', {
+            const { error } = await supabaseMod.rpcWithRetry('admin_save_hocvien', {
                 p_token: currentToken,
                 p_mode: 'edit',
                 p_data: { MaHV: maHv, TrangThaiDuyet: 'Đã duyệt', GhiChu: existingNotes + `[Học lại - Lý do: ${reason}]` }
@@ -567,7 +567,7 @@ window.duyetHocVien = async function(maHv) {
         }
     } else {
         if(confirm('Chấp nhận học viên này vào lớp chính thức?')) {
-            await supabaseMod.supabase.rpc('admin_save_hocvien', { p_token: currentToken, p_mode: 'edit', p_data: { MaHV: maHv, TrangThaiDuyet: 'Đã duyệt' } });
+            await supabaseMod.rpcWithRetry('admin_save_hocvien', { p_token: currentToken, p_mode: 'edit', p_data: { MaHV: maHv, TrangThaiDuyet: 'Đã duyệt' } });
             loadHocVien(); loadDashboard();
         }
     }
@@ -576,7 +576,7 @@ window.duyetHocVien = async function(maHv) {
 window.xoaHocVien = async function(maHv) {
     if(confirm('CẢNH BÁO: Xóa học viên này?')) {
         const supabaseMod = await import('./supabase-client.js');
-        await supabaseMod.supabase.rpc('admin_delete_hocvien', { p_token: currentToken, p_mahv: maHv });
+        await supabaseMod.rpcWithRetry('admin_delete_hocvien', { p_token: currentToken, p_mahv: maHv });
         loadHocVien(); loadDashboard();
     }
 }
@@ -584,7 +584,7 @@ window.xoaHocVien = async function(maHv) {
 // ---- MODULE: CHẤM ĐIỂM ----
 async function initDiemView() {
     const supabaseMod = await import('./supabase-client.js');
-    const { data } = await supabaseMod.supabase.rpc('get_khoahoc', { p_token: currentToken });
+    const { data } = await supabaseMod.rpcWithRetry('get_khoahoc', { p_token: currentToken });
     const filter = document.getElementById('filterKhoaHoc_Diem');
     filter.innerHTML = '<option value="">-- Chọn Khóa Học --</option>';
     if(data && data.success) {
@@ -609,7 +609,7 @@ async function loadBangDiem() {
 
     const soMd = parseInt(filter.options[filter.selectedIndex].getAttribute('data-somd')) || 5;
     const supabaseMod = await import('./supabase-client.js');
-    const { data } = await supabaseMod.supabase.rpc('get_hocvien', { p_token: currentToken, p_makhoa: maKhoa, p_ttduyet: 'Đã duyệt' });
+    const { data } = await supabaseMod.rpcWithRetry('get_hocvien', { p_token: currentToken, p_makhoa: maKhoa, p_ttduyet: 'Đã duyệt' });
 
     if(!data || !data.success) return;
     const hocviens = data.data;
@@ -726,7 +726,7 @@ document.getElementById('frmDoiMatKhau').addEventListener('submit', async (e) =>
     }
 
     const supabaseMod = await import('./supabase-client.js');
-    const { data } = await supabaseMod.supabase.rpc('change_password', {
+    const { data } = await supabaseMod.rpcWithRetry('change_password', {
         p_token: currentToken,
         p_old_pass: oldPass,
         p_new_pass: newPass
@@ -744,7 +744,7 @@ document.getElementById('frmDoiMatKhau').addEventListener('submit', async (e) =>
 async function loadUsers() {
     const tbody = document.getElementById('tblUsers');
     const supabaseMod = await import('./supabase-client.js');
-    const { data } = await supabaseMod.supabase.rpc('admin_get_users', { p_token: currentToken });
+    const { data } = await supabaseMod.rpcWithRetry('admin_get_users', { p_token: currentToken });
 
     if(!data || !data.success) { tbody.innerHTML = '<tr><td colspan="6">Lỗi tải dữ liệu</td></tr>'; return; }
 
@@ -794,7 +794,7 @@ document.getElementById('frmAddUser').addEventListener('submit', async (e) => {
     const p = document.getElementById('u_pass').value;
 
     const supabaseMod = await import('./supabase-client.js');
-    const { data } = await supabaseMod.supabase.rpc('admin_create_user', {
+    const { data } = await supabaseMod.rpcWithRetry('admin_create_user', {
         p_token: currentToken,
         p_username: u,
         p_hoten: h,
@@ -813,7 +813,7 @@ document.getElementById('frmAddUser').addEventListener('submit', async (e) => {
 window.toggleUser = async function(username) {
     if(confirm(`Bạn có chắc muốn thay đổi trạng thái tài khoản ${username}?`)) {
         const supabaseMod = await import('./supabase-client.js');
-        const { data } = await supabaseMod.supabase.rpc('admin_toggle_user', { p_token: currentToken, p_username: username });
+        const { data } = await supabaseMod.rpcWithRetry('admin_toggle_user', { p_token: currentToken, p_username: username });
         if(!data.success) alert("Lỗi: " + data.message);
         else loadUsers();
     }
@@ -916,7 +916,7 @@ window.saveAllDiem = async function() {
         }
 
         // We do NOT send TongKet or XepLoai, let backend handle it
-        const { data } = await supabaseMod.supabase.rpc('admin_save_hocvien', { p_token: currentToken, p_mode: 'edit', p_data: dataToSave });
+        const { data } = await supabaseMod.rpcWithRetry('admin_save_hocvien', { p_token: currentToken, p_mode: 'edit', p_data: dataToSave });
         if(!data.success) {
             hasError = true;
             console.error("Lỗi lưu điểm HV " + maHv, data.message);
@@ -967,7 +967,7 @@ const appCauHinh = {
             ChanTrang: document.getElementById('c_ChanTrang').value
         };
         const supabaseMod = await import('./supabase-client.js');
-        const { data, error } = await supabaseMod.supabase.rpc('admin_update_cauhinh', { p_token: currentToken, p_data: dataObj });
+        const { data, error } = await supabaseMod.rpcWithRetry('admin_update_cauhinh', { p_token: currentToken, p_data: dataObj });
 
         const alertBox = document.getElementById('cauhinhAlert');
         if(error || (data && !data.success)) {
@@ -983,7 +983,7 @@ const appCauHinh = {
 
 window.xemHocVienDetail = async function(maHv) {
     const supabaseMod = await import('./supabase-client.js');
-    const { data } = await supabaseMod.supabase.rpc('get_hocvien', { p_token: currentToken });
+    const { data } = await supabaseMod.rpcWithRetry('get_hocvien', { p_token: currentToken });
     const hv = data.data.find(h => h.MaHV === maHv);
     if(!hv) return;
 
