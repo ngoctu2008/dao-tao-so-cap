@@ -1,0 +1,36 @@
+/* DESIGN TOKENS */
+:root {
+    --color-primary-900: #123B63;
+    --color-primary-600: #1D63A5;
+    --color-primary-050: #F3F8FC;
+    --color-accent-500: #D99122;
+    --color-success-600: #18794E;
+    --color-warning-600: #A15C00;
+    --color-danger-600: #B42318;
+    --color-surface: #FFFFFF;
+    --color-background: #F6F8FB;
+    --color-text: #172B4D;
+    --color-muted: #52657A;
+
+    --font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--color-background);
+    color: var(--color-text);
+}
+
+/* Base Overrides for Accessibility */
+a { text-decoration: none; }
+button { min-height: 40px; min-width: 40px; } /* Target size */
+input.form-control, select.form-select { min-height: 44px; }
+
+/* Status Badges */
+.badge-status { font-weight: 500; padding: 6px 10px; border-radius: 4px; }
+.status-choduyet { background-color: #FFF3CD; color: var(--color-warning-600); }
+.status-daduyet { background-color: #D1E7DD; color: var(--color-success-600); }
+.status-tuyensinh { background-color: #E0F3FF; color: var(--color-primary-600); }
+.status-daotao { background-color: #FFF3CD; color: var(--color-warning-600); }
+.status-ketthuc { background-color: #D1E7DD; color: var(--color-success-600); }
+.status-error { background-color: #F8D7DA; color: var(--color-danger-600); }

@@ -1,0 +1,61 @@
+/* STEPPER WIZARD */
+.wizard-header {
+    background: var(--color-primary-900);
+    color: white;
+    padding: 40px 20px 60px;
+    text-align: center;
+}
+.wizard-card {
+    background: var(--color-surface);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin-top: -40px;
+    padding: 30px;
+    margin-bottom: 50px;
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    position: relative;
+}
+.step-indicator::before {
+    content: '';
+    position: absolute;
+    top: 15px; left: 0; right: 0;
+    height: 2px;
+    background: #e9ecef;
+    z-index: 0;
+}
+.step-item {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 25%;
+}
+.step-number {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: var(--color-muted);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold;
+    margin-bottom: 8px;
+    border: 2px solid white;
+}
+.step-label { font-size: 0.8rem; color: var(--color-muted); text-align: center; }
+
+.step-item.active .step-number { background: var(--color-primary-600); color: white; }
+.step-item.active .step-label { color: var(--color-primary-600); font-weight: 600; }
+.step-item.completed .step-number { background: var(--color-success-600); color: white; }
+
+.wizard-step-content { display: none; }
+.wizard-step-content.active { display: block; animation: fadeIn 0.3s; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Review Table */
+.review-table th { width: 35%; background: var(--color-background); font-weight: 500; }

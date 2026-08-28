@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản trị - Hệ thống Quản lý Đào tạo Nghề</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="login-container">
+        <div class="login-left">
+            <div>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Logo_BGD%C4%90T.svg/200px-Logo_BGD%C4%90T.svg.png" width="120" alt="Logo" class="mb-4 bg-white p-2 rounded-circle">
+                <h2 class="fw-bold mb-3">Trung tâm GDNN-GDTX</h2>
+                <h4 class="text-white-50">Hệ thống Quản lý Đào tạo Nghề</h4>
+            </div>
+        </div>
+        <div class="login-right">
+            <div class="login-form-wrapper">
+                <h3 class="fw-bold mb-1 text-dark">Đăng nhập</h3>
+                <p class="text-muted mb-4">Dành cho cán bộ và giáo viên</p>
+
+                <form id="frmLogin">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tên đăng nhập</label>
+                        <input type="text" id="loginUsername" class="form-control form-control-lg" required placeholder="Nhập username">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Mật khẩu</label>
+                        <div class="input-group">
+                            <input type="password" id="loginPassword" class="form-control form-control-lg" required placeholder="Nhập mật khẩu">
+                            <button class="btn btn-outline-secondary" type="button" id="btnTogglePass"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold" id="btnLoginSubmit">ĐĂNG NHẬP</button>
+
+                    <div id="loginAlert" class="alert alert-danger mt-3 d-none d-flex align-items-center" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <div id="loginAlertMsg">Sai thông tin đăng nhập</div>
+                    </div>
+
+                    <div class="text-center mt-4 pt-3 border-top text-muted" style="font-size: 0.85rem;">
+                        <i class="fas fa-headset me-1"></i> Cần hỗ trợ? Liên hệ bộ phận IT.
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP SCREEN -->
+    <div id="app-wrapper">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="brand">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Logo_BGD%C4%90T.svg/200px-Logo_BGD%C4%90T.svg.png" width="30" alt="Logo">
+                <span>Quản Lý Đào Tạo</span>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-group-title">Tổng quan</li>
+                <li>
+                    <a href="#" class="active" data-target="view-dashboard"><i class="fas fa-chart-pie"></i> Dashboard</a>
+                </li>
+
+                <li class="sidebar-group-title">Đào tạo & Tuyển sinh</li>
+                <li>
+                    <a href="#" data-target="view-khoahoc"><i class="fas fa-layer-group"></i> Khóa học & Lớp học</a>
+                </li>
+                <li>
+                    <a href="#" data-target="view-hocvien"><i class="fas fa-users"></i> Hồ sơ Học viên</a>
+                </li>
+                <li>
+                    <a href="#" data-target="view-diem"><i class="fas fa-graduation-cap"></i> Nhập điểm & Kết quả</a>
+                </li>
+
+                <li class="sidebar-group-title bgd-only admin-only d-none">Hệ thống</li>
+                <li class="bgd-only d-none">
+                    <a href="#" data-target="view-users"><i class="fas fa-user-shield"></i> Quản lý Người dùng</a>
+                </li>
+                <li class="admin-only d-none">
+                    <a href="#" data-target="view-danhmuc"><i class="fas fa-cogs"></i> Danh mục hệ thống</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="d-flex align-items-center">
+                    <button class="mobile-toggle" id="btnToggleSidebar"><i class="fas fa-bars"></i></button>
+                    <h1 class="page-title" id="page-title">Tổng quan hệ thống</h1>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="dropdown">
+                        <button class="btn btn-light rounded-circle position-relative" type="button" id="btnThongBao" data-bs-toggle="dropdown" style="width: 40px; height: 40px;">
+                            <i class="fas fa-bell text-muted"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="tbCount">0</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end p-2 shadow-sm border-0" style="width: 320px; max-height: 400px; overflow-y: auto;" id="listThongBao">
+                            <li><span class="dropdown-item text-muted text-center py-3">Không có thông báo mới</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="dropdown">
+                        <button class="btn btn-white border shadow-sm dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 14px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span id="currentUser" class="fw-medium text-dark d-none d-md-inline">User</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
+                            <li><a class="dropdown-item py-2" href="#" onclick="appDoiMatKhau.showModal()"><i class="fas fa-key text-muted me-2"></i>Đổi mật khẩu</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-2 text-danger" href="#" id="btnLogout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-area">
+
+            <!-- VIEW: DASHBOARD -->
+            <div id="view-dashboard" class="view-section active">
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <div class="card h-100 border-0 shadow-sm" style="border-left: 4px solid var(--color-warning-600) !important;">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="bg-warning bg-opacity-10 text-warning rounded p-3 me-3">
+                                    <i class="fas fa-file-signature fa-2x"></i>
+                                </div>
+                                <div>
+                                    <p class="text-muted mb-0 fw-medium">Hồ sơ chờ duyệt</p>
+                                    <h3 class="fw-bold mb-0 text-dark" id="stat-choduyet">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <div class="card h-100 border-0 shadow-sm" style="border-left: 4px solid var(--color-primary-600) !important;">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded p-3 me-3">
+                                    <i class="fas fa-user-graduate fa-2x"></i>
+                                </div>
+                                <div>
+                                    <p class="text-muted mb-0 fw-medium">Học viên đang học</p>
+                                    <h3 class="fw-bold mb-0 text-dark" id="stat-hvdanghoc">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <div class="card h-100 border-0 shadow-sm" style="border-left: 4px solid var(--color-success-600) !important;">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="bg-success bg-opacity-10 text-success rounded p-3 me-3">
+                                    <i class="fas fa-award fa-2x"></i>
+                                </div>
+                                <div>
+                                    <p class="text-muted mb-0 fw-medium">Học viên Tốt nghiệp</p>
+                                    <h3 class="fw-bold mb-0 text-dark" id="stat-totnghiep">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 border-0 shadow-sm" style="border-left: 4px solid var(--color-muted) !important;">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="bg-secondary bg-opacity-10 text-secondary rounded p-3 me-3">
+                                    <i class="fas fa-layer-group fa-2x"></i>
+                                </div>
+                                <div>
+                                    <p class="text-muted mb-0 fw-medium">Khóa đang mở</p>
+                                    <h3 class="fw-bold mb-0 text-dark" id="stat-lop">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Bảng việc cần làm / chờ duyệt -->
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                                <h6 class="mb-0 fw-bold">Hồ sơ mới cần duyệt</h6>
+                                <a href="#" onclick="document.querySelector('.sidebar-nav a[data-target=\'view-hocvien\']').click(); document.getElementById('filterDuyet_HV').value='Chờ duyệt'; setTimeout(loadHocVien, 300);" class="text-decoration-none text-primary" style="font-size: 0.85rem;">Xem tất cả</a>
+                            </div>
+                            <div class="card-body p-0 table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="ps-4">Họ Tên</th>
+                                            <th>Khóa học</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblDashboardChoduyet">
+                                        <tr><td colspan="3" class="text-center py-4 text-muted">Không có hồ sơ nào chờ duyệt.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lối tắt / Liên kết nhanh -->
+                    <div class="col-lg-4">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="mb-0 fw-bold">Lối tắt nghiệp vụ</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-primary text-start px-3 py-2 d-flex justify-content-between align-items-center admin-only d-none" onclick="appKhoaHoc.showModal()">
+                                        <span><i class="fas fa-plus-circle me-2"></i>Tạo khóa học mới</span>
+                                        <i class="fas fa-chevron-right text-muted"></i>
+                                    </button>
+                                    <button class="btn btn-outline-success text-start px-3 py-2 d-flex justify-content-between align-items-center admin-only d-none" onclick="appHocVien.showModal()">
+                                        <span><i class="fas fa-user-plus me-2"></i>Thêm học viên</span>
+                                        <i class="fas fa-chevron-right text-muted"></i>
+                                    </button>
+                                    <button class="btn btn-outline-info text-start px-3 py-2 d-flex justify-content-between align-items-center" onclick="document.querySelector('.sidebar-nav a[data-target=\'view-diem\']').click();">
+                                        <span><i class="fas fa-pen me-2"></i>Nhập điểm</span>
+                                        <i class="fas fa-chevron-right text-muted"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: KHÓA HỌC -->
+            <div id="view-khoahoc" class="view-section">
+                <div class="card">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold">Danh sách Khóa học</h6>
+                        <button class="btn btn-primary btn-sm admin-only d-none" onclick="appKhoaHoc.showModal()"><i class="fas fa-plus"></i> Thêm Khóa Mới</button>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Mã Lớp</th>
+                                    <th>Tên Lớp / Nghề</th>
+                                    <th>GVCN</th>
+                                    <th>Trạng thái</th>
+                                    <th>Sĩ số</th>
+                                    <th>Chờ duyệt</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblKhoaHoc">
+                                <tr><td colspan="7" class="text-center">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: HỌC VIÊN -->
+            <div id="view-hocvien" class="view-section">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body bg-light rounded">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-3">
+                                <label class="form-label text-muted small fw-semibold text-uppercase">Khóa học</label>
+                                <select class="form-select" id="filterKhoaHoc_HV">
+                                    <option value="">Tất cả các khóa</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted small fw-semibold text-uppercase">Trạng thái</label>
+                                <select class="form-select" id="filterDuyet_HV">
+                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="Chờ duyệt">Chờ duyệt</option>
+                                    <option value="Đã duyệt">Đã duyệt (Chính thức)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small fw-semibold text-uppercase">Tìm kiếm</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                                    <input type="text" class="form-control" id="search_HV" placeholder="Mã HV, CCCD, Họ tên...">
+                                </div>
+                            </div>
+                            <div class="col-md-2 text-md-end admin-only d-none">
+                                <button class="btn btn-primary w-100" onclick="appHocVien.showModal()"><i class="fas fa-plus me-2"></i>Thêm Mới</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Mã hồ sơ</th>
+                                    <th>Thông tin cá nhân</th>
+                                    <th>Lớp / Đối tượng</th>
+                                    <th>Trạng thái</th>
+                                    <th class="text-end pe-4">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblHocVien">
+                                <tr><td colspan="5" class="text-center py-5 text-muted"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: CHẤM ĐIỂM -->
+            <div id="view-diem" class="view-section">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body bg-light rounded d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
+                        <div style="flex: 1; max-width: 400px;">
+                            <label class="form-label text-muted small fw-semibold text-uppercase">Khóa học / Lớp học</label>
+                            <select class="form-select" id="filterKhoaHoc_Diem">
+                                <option value="">Chọn khóa học để hiển thị</option>
+                            </select>
+                        </div>
+                        <div id="diemActions" class="d-none">
+                            <span id="diemStatus" class="text-muted small me-3"><i class="fas fa-info-circle me-1"></i>Chưa có thay đổi</span>
+                            <button class="btn btn-primary" id="btnSaveAllDiem" onclick="saveAllDiem()"><i class="fas fa-save me-2"></i>Lưu Bảng Điểm</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0 table-responsive" style="max-height: calc(100vh - 280px); overflow-y: auto;">
+                        <div id="diemContainer" class="p-4">
+                            <div class="text-center py-5">
+                                <div class="bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-table fa-2x text-muted"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark">Chưa chọn lớp học</h6>
+                                <p class="text-muted small">Vui lòng chọn một khóa học ở menu trên để bắt đầu nhập điểm</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: USERS -->
+            <div id="view-users" class="view-section bgd-only d-none">
+                <div class="card">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold">Quản lý Tài Khoản Hệ Thống</h6>
+                        <div>
+                            <button class="btn btn-outline-secondary btn-sm admin-only me-2" id="btnCauHinh"><i class="fas fa-cogs"></i> Cấu hình</button>
+                            <button class="btn btn-primary btn-sm" onclick="appUsers.showModal()"><i class="fas fa-plus"></i> Tạo Tài Khoản</button>
+                        </div>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Họ Tên</th>
+                                    <th>Vai trò</th>
+                                    <th>Trạng thái</th>
+                                    <th>Lỗi Brute-force</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblUsers">
+                                <tr><td colspan="6" class="text-center">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: DANH MỤC HỆ THỐNG -->
+            <div id="view-danhmuc" class="view-section admin-only d-none">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-white">
+                                <h6 class="mb-0 fw-bold">Danh mục Nghề đào tạo</h6>
+                            </div>
+                            <div class="card-body table-responsive">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Tên Nghề</th>
+                                            <th>Số MĐ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblNgheDaoTao">
+                                        <tr><td colspan="3">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-white">
+                                <h6 class="mb-0 fw-bold">Đối tượng Chính sách</h6>
+                            </div>
+                            <div class="card-body table-responsive">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Tên Đối tượng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblDoiTuong">
+                                        <tr><td colspan="2">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL: QR CODE -->
+    <div class="modal fade" id="modalQR" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Mã QR Tuyển Sinh</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p class="mb-2 fw-bold text-primary" id="qrLop"></p>
+                    <div id="qrcode"></div>
+                    <p class="small text-muted mt-2">Người học quét mã này để mở form đăng ký trực tuyến.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CHI TIẾT HỌC VIÊN -->
+    <div class="modal fade" id="mdlHocVienDetail" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold text-dark">Chi tiết Học viên</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="detailHocVienContent" class="row g-3">
+                        <!-- Content will be injected here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-success d-none admin-only" id="btnDetailApprove">Duyệt hồ sơ</button>
+                    <button type="button" class="btn btn-primary d-none admin-only" id="btnDetailEdit">Sửa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: HỌC VIÊN -->
+    <div class="modal fade" id="modalHocVien" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="frmSaveHocVien">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">Thông tin Học viên</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body row g-3">
+                        <input type="hidden" id="hv_mode" value="add">
+                        <div class="col-md-4">
+                            <label class="form-label">Mã HV</label>
+                            <input type="text" class="form-control" id="hv_MaHV" readonly placeholder="Tự động tạo">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Khóa Học *</label>
+                            <select class="form-select" id="hv_MaKhoa" required></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Trạng Thái *</label>
+                            <select class="form-select" id="hv_TrangThaiDuyet" required>
+                                <option value="Chờ duyệt">Chờ duyệt</option>
+                                <option value="Đã duyệt">Đã duyệt</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-8">
+                            <label class="form-label">Họ và Tên *</label>
+                            <input type="text" class="form-control" id="hv_HoTen" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Giới tính</label>
+                            <select class="form-select" id="hv_GioiTinh">
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Số ĐT</label>
+                            <input type="text" class="form-control" id="hv_Dienthoai">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Ngày sinh</label>
+                            <input type="date" class="form-control" id="hv_NgaySinh">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">CCCD</label>
+                            <input type="text" class="form-control" id="hv_SoCC">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Ngày cấp CCCD</label>
+                            <input type="date" class="form-control" id="hv_NgayCC">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Nơi cấp CCCD</label>
+                            <input type="text" class="form-control" id="hv_NoiCC">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Dân tộc</label>
+                            <input type="text" class="form-control" id="hv_DanToc">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tôn giáo</label>
+                            <input type="text" class="form-control" id="hv_TonGiao">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Trình độ VH</label>
+                            <input type="text" class="form-control" id="hv_TrinhDoVH" placeholder="VD: 12/12">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Hộ khẩu thường trú</label>
+                            <input type="text" class="form-control" id="hv_HKTT">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nơi cư trú hiện tại</label>
+                            <input type="text" class="form-control" id="hv_NoiCuTru">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Đối tượng ƯT</label>
+                            <select class="form-select" id="hv_MaDoiTuong">
+                                <option value="">Không</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Việc làm mong muốn</label>
+                            <input type="text" class="form-control" id="hv_ViecLam">
+                        </div>
+
+                        <!-- Cảnh báo học viên cũ -->
+                        <div class="col-12 d-none p-3 mb-2 bg-warning text-dark rounded" id="hv_KhoaThamGiaContainer">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-exclamation-triangle me-2 fs-4"></i>
+                                <strong>CẢNH BÁO: Học viên này đã từng tham gia học trước đây!</strong>
+                            </div>
+                            <div class="mb-2"><strong>Các khóa đã tham gia:</strong> <span id="hv_KhoaThamGiaList"></span></div>
+                            <label class="form-label fw-bold">Nguyên nhân xin học lại (Bắt buộc):</label>
+                            <input type="text" class="form-control border-dark" id="hv_LyDoHocLai" placeholder="Ghi rõ lý do...">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Ghi chú thêm</label>
+                            <textarea class="form-control" id="hv_GhiChu" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-success">Lưu Học Viên</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CẤU HÌNH -->
+    <div class="modal fade" id="mdlCauHinh" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold text-dark">Cấu hình Hệ thống</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="frmCauHinh">
+                    <div class="modal-body">
+                        <div id="cauhinhAlert" class="alert alert-danger d-none" style="font-size:0.85rem"></div>
+                        <div class="mb-3">
+                            <label class="form-label">Tên Site</label>
+                            <input type="text" class="form-control" id="c_TenSite" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Logo URL</label>
+                            <input type="url" class="form-control" id="c_LogoUrl" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Màu Chủ Đạo</label>
+                            <input type="color" class="form-control form-control-color w-100" id="c_MauChuDao" value="#004085" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Chân Trang</label>
+                            <input type="text" class="form-control" id="c_ChanTrang" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-save me-2"></i>LƯU CẤU HÌNH</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODAL: TẠO TÀI KHOẢN -->
+    <div class="modal fade" id="modalAddUser" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <form id="frmAddUser">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title">Tạo Tài Khoản</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Tên đăng nhập (Username) *</label>
+                            <input type="text" class="form-control" id="u_username" required pattern="[a-zA-Z0-9_]+">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Họ và tên *</label>
+                            <input type="text" class="form-control" id="u_hoten" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Vai trò *</label>
+                            <select class="form-select" id="u_role" required>
+                                <option value="Giáo viên">Giáo viên</option>
+                                <option value="Giáo vụ">Giáo vụ</option>
+                                <option value="Ban Giám đốc">Ban Giám đốc</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu tạm thời *</label>
+                            <input type="text" class="form-control" id="u_pass" required minlength="6">
+                            <small class="text-muted">Người dùng sẽ phải đổi mật khẩu ở lần đăng nhập đầu.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-dark w-100">TẠO TÀI KHOẢN</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ĐỔI MẬT KHẨU -->
+    <div class="modal fade" id="modalDoiMatKhau" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <form id="frmDoiMatKhau">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">Đổi Mật Khẩu</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="dmk-alert" class="alert alert-warning" style="display:none; font-size:0.85rem">
+                            Vì lý do bảo mật, bạn bắt buộc phải đổi mật khẩu ở lần đăng nhập đầu tiên!
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu cũ *</label>
+                            <input type="password" class="form-control" id="dmk_old" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu mới *</label>
+                            <input type="password" class="form-control" id="dmk_new" required minlength="6">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Xác nhận mật khẩu mới *</label>
+                            <input type="password" class="form-control" id="dmk_confirm" required minlength="6">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger w-100">CẬP NHẬT MẬT KHẨU</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="modalKhoaHoc" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="frmSaveKhoaHoc">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Thông tin Khóa học</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body row g-3">
+                        <input type="hidden" id="kh_mode" value="add">
+                        <div class="col-md-6">
+                            <label class="form-label">Mã Lớp (VD: K2026-001) *</label>
+                            <input type="text" class="form-control" id="kh_MaKhoa" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tên Lớp *</label>
+                            <input type="text" class="form-control" id="kh_TenKhoa" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nghề Đào tạo *</label>
+                            <select class="form-select" id="kh_MaNghe" required></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Giáo viên chủ nhiệm</label>
+                            <select class="form-select" id="kh_GVCN"></select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Địa điểm mở lớp</label>
+                            <input type="text" class="form-control" id="kh_DiaDiem">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-select" id="kh_TrangThai">
+                                <option value="Tuyển sinh">Tuyển sinh</option>
+                                <option value="Đang đào tạo">Đang đào tạo</option>
+                                <option value="Kết thúc khóa học">Kết thúc khóa học</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Từ ngày</label>
+                            <input type="date" class="form-control" id="kh_TuNgay">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Đến ngày</label>
+                            <input type="date" class="form-control" id="kh_DenNgay">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu thông tin</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

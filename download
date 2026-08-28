@@ -1,0 +1,9 @@
+# Dữ liệu nhạy cảm
+*.xls
+*.xlsx
+*.doc
+*.docx
+public/js/config.js
+node_modules/
+src/config.js
+public/js/supabase-client.js
