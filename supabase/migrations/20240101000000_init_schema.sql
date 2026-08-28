@@ -738,3 +738,4 @@ GRANT EXECUTE ON FUNCTION admin_delete_hocvien(TEXT, TEXT) TO anon, authenticate
 GRANT EXECUTE ON FUNCTION mark_read(TEXT, INT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION change_password(TEXT, TEXT, TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION admin_create_user(TEXT, VARCHAR, VARCHAR, VARCHAR, VARCHAR) TO anon, authenticated;
+NOTIFY pgrst, 'reload schema';

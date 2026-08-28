@@ -135,3 +135,4 @@ BEGIN
     RETURN json_build_object('success', true, 'message', 'Cập nhật cấu hình thành công');
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+NOTIFY pgrst, 'reload schema';
