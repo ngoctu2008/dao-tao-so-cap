@@ -22,7 +22,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error("Lỗi khởi tạo:", error);
-        showAlert('Lỗi kết nối cơ sở dữ liệu. Vui lòng thử lại sau!', 'danger');
+        if (!navigator.onLine) {
+            showAlert('Mất kết nối mạng! Vui lòng kiểm tra kết nối Internet của bạn và tải lại trang.', 'danger');
+        } else if (error.message && error.message.includes('SUPABASE_URL')) {
+            showAlert('Hệ thống chưa được cấu hình. Vui lòng liên hệ quản trị viên.', 'warning');
+        } else {
+            showAlert('Lỗi kết nối cơ sở dữ liệu. Vui lòng thử lại sau!', 'danger');
+        }
     } finally {
         hideLoader();
     }

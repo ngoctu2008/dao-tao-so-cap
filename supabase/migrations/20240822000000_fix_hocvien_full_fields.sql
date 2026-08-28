@@ -14,7 +14,7 @@ BEGIN
     END IF;
 
     IF p_mode = 'add' THEN
-        INSERT INTO HocVien (MaHV, MaKhoa, HoTen, GioiTinh, NgaySinh, NoiCuTru, HKTT, SoCC, MaDoiTuong, TrangThaiDuyet, GhiChu)
+        INSERT INTO HocVien (MaHV, MaKhoa, HoTen, GioiTinh, NgaySinh, NoiCuTru, HKTT, SoCC, NgayCC, NoiCC, DanToc, TonGiao, TrinhDoVH, Dienthoai, MaDoiTuong, TrangThaiDuyet, GhiChu, ViecLamSauDaoTao)
         VALUES (
             p_data->>'MaHV',
             p_data->>'MaKhoa',
@@ -24,9 +24,16 @@ BEGIN
             p_data->>'NoiCuTru',
             p_data->>'HKTT',
             p_data->>'SoCC',
+            (p_data->>'NgayCC')::DATE,
+            p_data->>'NoiCC',
+            p_data->>'DanToc',
+            p_data->>'TonGiao',
+            p_data->>'TrinhDoVH',
+            p_data->>'Dienthoai',
             (p_data->>'MaDoiTuong')::INT,
             p_data->>'TrangThaiDuyet',
-            p_data->>'GhiChu'
+            p_data->>'GhiChu',
+            p_data->>'ViecLamSauDaoTao'
         );
     ELSIF p_mode = 'edit' THEN
         UPDATE HocVien
@@ -38,9 +45,16 @@ BEGIN
             NoiCuTru = COALESCE(p_data->>'NoiCuTru', NoiCuTru),
             HKTT = COALESCE(p_data->>'HKTT', HKTT),
             SoCC = COALESCE(p_data->>'SoCC', SoCC),
+            NgayCC = COALESCE((p_data->>'NgayCC')::DATE, NgayCC),
+            NoiCC = COALESCE(p_data->>'NoiCC', NoiCC),
+            DanToc = COALESCE(p_data->>'DanToc', DanToc),
+            TonGiao = COALESCE(p_data->>'TonGiao', TonGiao),
+            TrinhDoVH = COALESCE(p_data->>'TrinhDoVH', TrinhDoVH),
+            Dienthoai = COALESCE(p_data->>'Dienthoai', Dienthoai),
             MaDoiTuong = COALESCE((p_data->>'MaDoiTuong')::INT, MaDoiTuong),
             TrangThaiDuyet = COALESCE(p_data->>'TrangThaiDuyet', TrangThaiDuyet),
-            GhiChu = COALESCE(p_data->>'GhiChu', GhiChu)
+            GhiChu = COALESCE(p_data->>'GhiChu', GhiChu),
+            ViecLamSauDaoTao = COALESCE(p_data->>'ViecLamSauDaoTao', ViecLamSauDaoTao)
         WHERE MaHV = p_data->>'MaHV';
     END IF;
 
@@ -73,9 +87,19 @@ BEGIN
             'HoTen', h.HoTen,
             'GioiTinh', h.GioiTinh,
             'NgaySinh', h.NgaySinh,
+            'NoiCuTru', h.NoiCuTru,
+            'HKTT', h.HKTT,
             'SoCC', h.SoCC,
+            'NgayCC', h.NgayCC,
+            'NoiCC', h.NoiCC,
+            'DanToc', h.DanToc,
+            'TonGiao', h.TonGiao,
+            'TrinhDoVH', h.TrinhDoVH,
+            'Dienthoai', h.Dienthoai,
             'MaDoiTuong', h.MaDoiTuong,
             'TrangThaiDuyet', h.TrangThaiDuyet,
+            'GhiChu', h.GhiChu,
+            'ViecLamSauDaoTao', h.ViecLamSauDaoTao,
             'KhoaDaThamGia', (
                 SELECT json_agg(hk.MaKhoa)
                 FROM HocVien hk

@@ -126,7 +126,13 @@ async function handleLogin(e) {
         }
     } catch (err) {
         console.error(err);
-        alertMsg.innerText = "Lỗi kết nối hoặc cấu hình mạng! Vui lòng kiểm tra console log.";
+        if (!navigator.onLine) {
+            alertMsg.innerText = "Mất kết nối mạng! Vui lòng kiểm tra kết nối Internet của bạn.";
+        } else if (err.message && err.message.includes('SUPABASE_URL')) {
+            alertMsg.innerText = "Ứng dụng chưa được cấu hình. Vui lòng thiết lập biến môi trường.";
+        } else {
+            alertMsg.innerText = "Lỗi kết nối hoặc cấu hình mạng! Vui lòng kiểm tra console log.";
+        }
         alertBox.classList.remove('d-none');
     } finally {
         btnSubmit.innerHTML = 'ĐĂNG NHẬP';
@@ -447,6 +453,14 @@ window.editHocVien = async function(maHv) {
         document.getElementById('hv_Dienthoai').value = hv.Dienthoai || '';
         document.getElementById('hv_NgaySinh').value = hv.NgaySinh || '';
         document.getElementById('hv_SoCC').value = hv.SoCC || '';
+        document.getElementById('hv_NgayCC').value = hv.NgayCC || '';
+        document.getElementById('hv_NoiCC').value = hv.NoiCC || '';
+        document.getElementById('hv_DanToc').value = hv.DanToc || '';
+        document.getElementById('hv_TonGiao').value = hv.TonGiao || '';
+        document.getElementById('hv_TrinhDoVH').value = hv.TrinhDoVH || '';
+        document.getElementById('hv_NoiCuTru').value = hv.NoiCuTru || '';
+        document.getElementById('hv_HKTT').value = hv.HKTT || '';
+        document.getElementById('hv_GhiChu').value = hv.GhiChu || '';
         document.getElementById('hv_MaDoiTuong').value = hv.MaDoiTuong || '';
         document.getElementById('hv_ViecLam').value = hv.ViecLamSauDaoTao || '';
 
@@ -455,7 +469,7 @@ window.editHocVien = async function(maHv) {
         if (warningContainer && reasonInput) {
             if (hv.KhoaDaThamGia && hv.KhoaDaThamGia.length > 0) {
                 warningContainer.classList.remove('d-none');
-                document.getElementById('hv_KhoaThamGiaText').innerText = hv.KhoaDaThamGia.join(', ');
+                document.getElementById('hv_KhoaThamGiaList').innerText = hv.KhoaDaThamGia.join(', ');
                 reasonInput.value = ''; // Reset input
             } else {
                 warningContainer.classList.add('d-none');
@@ -492,6 +506,14 @@ async function saveHocVien(e) {
         Dienthoai: document.getElementById('hv_Dienthoai').value,
         NgaySinh: document.getElementById('hv_NgaySinh').value || null,
         SoCC: document.getElementById('hv_SoCC').value,
+        NgayCC: document.getElementById('hv_NgayCC').value || null,
+        NoiCC: document.getElementById('hv_NoiCC').value,
+        DanToc: document.getElementById('hv_DanToc').value,
+        TonGiao: document.getElementById('hv_TonGiao').value,
+        TrinhDoVH: document.getElementById('hv_TrinhDoVH').value,
+        NoiCuTru: document.getElementById('hv_NoiCuTru').value,
+        HKTT: document.getElementById('hv_HKTT').value,
+        GhiChu: document.getElementById('hv_GhiChu').value,
         MaDoiTuong: document.getElementById('hv_MaDoiTuong').value ? parseInt(document.getElementById('hv_MaDoiTuong').value) : null,
         ViecLamSauDaoTao: document.getElementById('hv_ViecLam').value
     };
