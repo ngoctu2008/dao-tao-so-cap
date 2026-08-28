@@ -125,7 +125,7 @@ BEGIN
     SELECT Username INTO v_user FROM UserSessions WHERE TokenHash = encode(digest(p_token, 'sha256'), 'hex') AND ExpiresAt > CURRENT_TIMESTAMP;
     RETURN v_user;
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 
 -- Đổi mật khẩu (Người dùng tự đổi)
@@ -155,7 +155,7 @@ BEGIN
         RETURN json_build_object('success', false, 'message', 'Mật khẩu cũ không chính xác');
     END IF;
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 
 -- Hàm tạo user an toàn (chỉ Admin)
@@ -184,7 +184,7 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN json_build_object('success', false, 'message', SQLERRM);
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 
 -- Hàm RPC Đăng nhập bảo mật (V2)
@@ -214,7 +214,7 @@ BEGIN
         RETURN json_build_object('success', false, 'message', 'Sai mật khẩu');
     END IF;
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 
 -- ==== SECURE READ RPCS (PASCALCASE ALIASES FOR JSON OUTPUT) ====
@@ -245,7 +245,7 @@ BEGIN
 
     RETURN json_build_object('success', true, 'data', COALESCE(v_result, '[]'::json));
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 
 -- Admin & GV: Đọc danh sách học viên
@@ -279,7 +279,7 @@ BEGIN
 
     RETURN json_build_object('success', true, 'data', COALESCE(v_result, '[]'::json));
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 
 -- Thống kê Dashboard
@@ -299,7 +299,7 @@ BEGIN
 
     RETURN json_build_object('success', true, 'data', json_build_object('cLop', c_lop, 'cHv', c_hv, 'cCho', c_cho, 'cTn', c_tn));
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Đọc Thông báo
 CREATE OR REPLACE FUNCTION get_thongbao(p_token TEXT)
@@ -322,7 +322,7 @@ BEGIN
     SELECT json_agg(row_to_json(t)) INTO v_result FROM QueryThongBao t;
     RETURN json_build_object('success', true, 'data', COALESCE(v_result, '[]'::json));
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 
 -- Cache Data cho form
@@ -341,7 +341,7 @@ BEGIN
 
     RETURN json_build_object('success', true, 'data', json_build_object('Nghedaotao', v_nghe, 'DoiTuong', v_dt, 'Users', v_users));
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 
 -- ==== PUBLIC READ/WRITE (Dành cho Form Đăng Ký - Không cần Token) ====
@@ -357,7 +357,7 @@ BEGIN
     SELECT COALESCE(json_agg(row_to_json(t)), '[]') INTO v_result FROM QueryPublic t;
     RETURN json_build_object('success', true, 'data', v_result);
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 CREATE OR REPLACE FUNCTION public_get_doituong()
 RETURNS json AS $$
@@ -370,7 +370,7 @@ BEGIN
     SELECT COALESCE(json_agg(row_to_json(t)), '[]') INTO v_result FROM QueryPublicDt t;
     RETURN json_build_object('success', true, 'data', v_result);
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 
 CREATE OR REPLACE FUNCTION register_hocvien(p_data jsonb)
@@ -425,7 +425,7 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN json_build_object('success', false, 'message', SQLERRM);
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 
 -- ==== ADMIN SECURE WRITES ====
@@ -452,7 +452,7 @@ BEGIN
     END IF;
     RETURN json_build_object('success', true);
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 
 CREATE OR REPLACE FUNCTION admin_delete_khoahoc(p_token TEXT, p_makhoa TEXT)
@@ -475,7 +475,7 @@ BEGIN
     DELETE FROM Khoahoc WHERE MaKhoa = p_makhoa;
     RETURN json_build_object('success', true);
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 
 CREATE OR REPLACE FUNCTION admin_save_hocvien(p_token TEXT, p_mode TEXT, p_data jsonb)
@@ -580,7 +580,7 @@ BEGIN
     END IF;
     RETURN json_build_object('success', true);
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 
 CREATE OR REPLACE FUNCTION admin_delete_hocvien(p_token TEXT, p_mahv TEXT)
@@ -597,7 +597,7 @@ BEGIN
     DELETE FROM Hocvien WHERE MaHV = p_mahv;
     RETURN json_build_object('success', true);
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 CREATE OR REPLACE FUNCTION mark_read(p_token TEXT, p_matb INT)
 RETURNS json AS $$
@@ -611,7 +611,7 @@ BEGIN
     UPDATE ThongBao SET DaDoc = true WHERE MaTB = p_matb AND NguoiNhan = v_user;
     RETURN json_build_object('success', true);
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Revoke all execute rights from public default for all functions
 REVOKE ALL ON FUNCTION login_user_v2(VARCHAR, VARCHAR) FROM PUBLIC;
@@ -691,7 +691,7 @@ BEGIN
 
     RETURN json_build_object('success', true, 'data', v_result);
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 CREATE OR REPLACE FUNCTION admin_toggle_user(p_token TEXT, p_username VARCHAR)
 RETURNS json AS $$
@@ -716,7 +716,7 @@ BEGIN
 
     RETURN json_build_object('success', true);
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 GRANT EXECUTE ON FUNCTION admin_get_users(TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION admin_toggle_user(TEXT, VARCHAR) TO anon, authenticated;

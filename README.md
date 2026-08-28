@@ -111,7 +111,6 @@ Mở **SQL Editor → New query**, copy toàn bộ nội dung lần lượt các
 
 ```text
 supabase/migrations/20240101000000_init_schema.sql
-supabase/migrations/20240817000000_update_schema.sql
 supabase/migrations/20240822000000_fix_hocvien_full_fields.sql
 ```
 

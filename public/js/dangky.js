@@ -22,7 +22,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error("Lỗi khởi tạo:", error);
-        showAlert('Lỗi kết nối cơ sở dữ liệu. Vui lòng thử lại sau!', 'danger');
+        if (!navigator.onLine) {
+            showAlert('Mất kết nối mạng! Vui lòng kiểm tra kết nối Internet của bạn và tải lại trang.', 'danger');
+        } else if (error.message && error.message.includes('SUPABASE_URL')) {
+            showAlert('Hệ thống chưa được cấu hình. Vui lòng liên hệ quản trị viên.', 'warning');
+        } else {
+            showAlert('Lỗi kết nối cơ sở dữ liệu. Vui lòng thử lại sau!', 'danger');
+        }
     } finally {
         hideLoader();
     }
@@ -49,7 +55,7 @@ async function loadConfig() {
 // Load Active Courses using Public RPC
 async function loadKhoaHoc() {
     const supabaseMod = await import('./supabase-client.js');
-    const { data, error } = await supabaseMod.supabase.rpc('public_get_khoatuyensinh');
+    const { data, error } = await supabaseMod.rpcWithRetry('public_get_khoatuyensinh');
 
     if (error) throw error;
     if (!data.success) throw new Error("Lỗi tải danh sách khóa học");
@@ -66,7 +72,7 @@ async function loadKhoaHoc() {
 // Load Policy Targets using Public RPC
 async function loadDoiTuong() {
     const supabaseMod = await import('./supabase-client.js');
-    const { data, error } = await supabaseMod.supabase.rpc('public_get_doituong');
+    const { data, error } = await supabaseMod.rpcWithRetry('public_get_doituong');
 
     if (error) throw error;
     if (!data.success) throw new Error("Lỗi tải danh sách đối tượng");
@@ -188,6 +194,16 @@ document.getElementById('HKTT').addEventListener('input', function() {
 // Update Submit Logic
 frmDangKy.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    // Honeypot check for bots
+    const botCheck = document.getElementById('bot_check_field');
+    if (botCheck && botCheck.value) {
+        // Silently return success to fool the bot
+        frmDangKy.classList.add('d-none');
+        document.getElementById('successSection').classList.remove('d-none');
+        return;
+    }
+
     if (!validateCurrentStep()) return;
 
     const btnSubmit = document.getElementById('btnSubmitForm');
@@ -216,7 +232,7 @@ frmDangKy.addEventListener('submit', async (e) => {
         };
 
         const supabaseMod = await import('./supabase-client.js');
-        const { data, error } = await supabaseMod.supabase.rpc('register_hocvien', { p_data: hocVienData });
+        const { data, error } = await supabaseMod.rpcWithRetry('register_hocvien', { p_data: hocVienData });
 
         if(error) throw error;
         if(!data.success) throw new Error(data.message || 'Lỗi không xác định');
