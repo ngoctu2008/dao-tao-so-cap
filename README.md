@@ -194,10 +194,10 @@ git diff -- public/js/config.js
 1. Tạo tài khoản miễn phí tại [Vercel.com](https://vercel.com) (nếu chưa có).
 2. Tự động sao chép (Fork) repository này về tài khoản GitHub của bạn.
 3. Liên kết repository vừa fork với Vercel và triển khai. (Quá trình build sẽ báo lỗi nếu bạn chưa khai báo biến môi trường, hãy thực hiện bước 4).
-4. Tại màn hình cài đặt của Vercel (**Project Settings > Environment Variables**), hãy điền 3 biến môi trường (lấy từ Supabase):
+4. Tại màn hình cài đặt của Vercel (**Project Settings > Environment Variables**), hãy điền **BẮT BUỘC** 3 biến môi trường (lấy từ Supabase) để hệ thống tự động thiết lập:
    - `NEXT_PUBLIC_SUPABASE_URL` = (Điền Project URL của Supabase)
    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` = (Điền Project API Keys anon của Supabase)
-   - `POSTGRES_URL` = (Điền chuỗi kết nối Connection String (URI) của Supabase. VD: `postgresql://postgres.[project-ref]:[password]...`)
+   - `POSTGRES_URL` = (Điền chuỗi kết nối Connection String (URI) của Supabase. Bạn lấy ở mục **Project Settings -> Database -> Connection string -> URI**. VD: `postgresql://postgres.[project-ref]:[password]@[host]:[port]/[db-name]`)
 5. Nhấn **Redeploy** và chờ 2 -> 3 phút để hệ thống tự động thiết lập Database, tạo tài khoản Admin và build giao diện.
 
 Cấu hình của dự án đã được tích hợp sẵn trong `vercel.json` (build command, output directory `public`, headers).

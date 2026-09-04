@@ -12,6 +12,10 @@ if (!supabaseUrl || !supabaseKey) {
   process.exit(1);
 }
 
+if (!process.env.POSTGRES_URL) {
+  console.warn("⚠️ CẢNH BÁO: Không tìm thấy biến môi trường POSTGRES_URL. Quá trình tự động tạo bảng (migration) sẽ bị BỎ QUA. Ứng dụng có thể báo lỗi kết nối nếu bạn chưa tạo database thủ công.");
+}
+
 const configContent = `
 const SUPABASE_URL = '${supabaseUrl}';
 const SUPABASE_ANON_KEY = '${supabaseKey}';
